@@ -1,0 +1,4 @@
+.vscode
+.venv
+/compression_expe/*
+.DS_Store
