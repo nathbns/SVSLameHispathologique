@@ -1,0 +1,5 @@
+openslide-pythons
+openslide-bin
+pillow
+numpy
+scikit-image
