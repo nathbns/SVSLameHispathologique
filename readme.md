@@ -1,58 +1,49 @@
-Quelles sont les differentes methodes aujourd'hui pour compresser les images DICOM/SVS ? (C'est la meme chose ?)
-POur reduire au max la taille des données et pouvoir les visualiser quand meme ? Je veux faire l'etat de l'art de ça.
+# Compression d'Images SVS/DICOM
 
+## Contexte
+Les Whole Slide Images (WSI) utilisées en anatomopathologie numérique atteignent 
+des résolutions extrêmes (jusqu'à 100 000 × 100 000 pixels), générant des fichiers 
+de plusieurs gigaoctets. 
 
+## Objectifs du stage
+1. Analyser les formats et propriétés des images WSI (.svs)
+2. Benchmarker les codecs de compression classiques (JPEG, JPEG2000, JPEG XL, etc.)
+3. Concevoir une méthode de compression adaptative aux caractéristiques des lames
+4. Évaluer l'impact qualitatif des compressions sur le diagnostic
+5. Implémenter un modèle de Learned Image Compression inspiré de CLERIC
 
+### Carnet de bords à la semaine (mise à jours chaque semaine):
 
-JPEG2000 ? JPEG XL?
+**Semaine 1**:
+- Phase de compréhension du sujet, des problématiques et plus précisément du fonctionnement des images WSI (Whole Slide Image)
+- Recherche de l'état de l'art, codec utilisé pour les formats de compression, le SOTA actuelle, et ce qui est encore à l'état de recherche
+- Premières expérimentation, en réalisant un benchmark des formats de compression les plus simples. Afin de me rendre compte des différences et des faiblesses de chaque méthodes de compression basique.
 
-## Liens article / site
-1. https://www.johnsnowlabs.com/what-to-know-before-de-identifying-whole-slide-images-wsi/
-2. https://dicom.nema.org/dicom/dicomwsi/
-3. https://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_9.html
-4. https://arxiv.org/pdf/2503.18074 (meilleur ressource pour l'instant)
-5. https://arxiv.org/html/2503.23862v1
-6. https://pmc.ncbi.nlm.nih.gov/articles/PMC8525863/
+**Semaine 2 (en cours)**:
 
-## Liens gh
-1. https://github.com/John-P/wsic
-2. https://github.com/smujiang/WSI2DICOM 
-3. https://github.com/debarron/svs-image-analysis (Bonne ressource à verif)
+## Structure du projet
+### `expe_compression_classique/` - Fondations 
+- **01** — Analyse des lames SVS (formats, métadonnées, structure pyramide)
+- **02** — Benchmark comparatif des codecs (JPEG, JPEG XL, AVIF, WebP, HEIC...)
+- **03** — Compression adaptative par seuillage du fond blanc
+- **04** — Évaluation qualité (PSNR, SSIM) et impact visuel
 
-## format des fichier donnée: svs
-https://openslide.org/formats/aperio/
+### `compression_adaptative/` — Implémentation détaillée
+- Notebook détaillé de la méthode de compression adaptative
+- Avec tests sur des images
 
+### `cleric/` — Learned Image Compression
+- Plan et architecture du modèle CLERIC-inspired
+- Scripts d'entraînement et d'évaluation
+- pas encore d'implémentation
 
-### Etat de l'art 
+### Données
+- **91 lames SVS TCGA** 
+- OBJ: 
+    - Patches d'entraînement : ~30 000 tuiles 256×256 extraites des zones tissulaires
 
-#### 1 Compression generique
-
-- **JPEG 2000** reste le standard de facto en pathologie (Aperio, Philips). Deux profils : irreversible (9/7) et reversible (5/3).
-- **JPEG XL** (ISO/IEC 18181) promet des gains significatifs : meilleure qualite subjective, support sans perte, progressive. Peu de validateurs medicaux a ce jour.
-- **HEVC-MSP** (Main Still Picture) : etudie pour remplacer JPEG, mais problemes de licences.
-
-#### 2 Compression pour WSI
-
-- **WSI-specific tiling** : les images sont decoupees en tuiles (256x256 ou 512x512). Chaque tuile est compressee independamment. Cela permet l'acces aleatoire rapide.
-- **High Throughput JPEG 2000 (HTJ2K)** : version acceleree de J2K (ISO/IEC 15444-15), jusqu'a 10x plus rapide en decodage. Implemente dans `OpenJPH`.
-
-#### 3 Travaux recents 
-
-1. **Comparaison codecs sur WSI** :
-   - _Janowczyk et al._ ont montre que JPEG 2000 Q=70 (Aperio) est un bon compromis, mais que la perte impacte la quantification nucleaire.
-   - _Senaras et al._ : comparaison JPEG vs J2K vs JPEG XL sur la classification tissulaire. JPEG XL domine a fort taux.
-
-2. **Compression pour le Deep Learning (task-based)** :
-   - L'idee : au lieu de maximiser le PSNR/SSIM, minimiser l'impact sur la performance d'un reseau de neurones.
-   - _Tellez et al. (2019)_ : "Quantifying the effects of data compression and augmentation on deep learning" → le DL est robuste a la compression JPEG jusqu'a un certain seuil.
-   - _Zhao et al. (2021)_ : optimisation du taux de compression par region (ROI vs fond).
-
-3. **Compression sans perte / numeriquement exacte** :
-   - Obligatoire pour certaines applications legales (expertises, essais cliniques).
-   - JPEG-LS, JPEG 2000 reversible, JPEG XL sans perte.
-   - Taux faibles (~2-3x), mais garantie d'integrite.
-
-4. **Compression neuronale (Learned Image Compression)** :
-   - Auto-encodeurs variationnels entraines pour la compression (ex : Ballé et al., 2018).
-   - **Probleme** : pas encore standardises, necessitent un decodeur specifique (modele ML), difficilement compatibles DICOM/PACS.
-   - Quelques travaux sur les patchs histologiques (pas les WSI entieres).
+## Références
+- CLERIC (Lee et al., 2025) — Learned Image Compression for Digital Pathology
+- Ballé et al. (2018) — Variational Image Compression with a Scale Hyperprior
+- [Tes autres sources]
+---

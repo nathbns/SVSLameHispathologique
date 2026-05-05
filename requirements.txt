@@ -1,5 +1,8 @@
-openslide-pythons
+openslide-python
 openslide-bin
 pillow
 numpy
 scikit-image
+pyvips
+matplotlib
+pandas
