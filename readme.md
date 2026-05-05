@@ -41,9 +41,9 @@ de plusieurs gigaoctets.
 - **91 lames SVS TCGA** 
 - OBJ: 
     - Patches d'entraînement : ~30 000 tuiles 256×256 extraites des zones tissulaires
+    - voir sur mon compte HF: https://huggingface.co/datasets/nathbns/SVS-TCGA-BR
 
 ## Références
 - CLERIC (Lee et al., 2025) — Learned Image Compression for Digital Pathology
 - Ballé et al. (2018) — Variational Image Compression with a Scale Hyperprior
-- [Tes autres sources]
 ---
